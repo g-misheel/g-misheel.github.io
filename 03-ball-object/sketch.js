@@ -32,19 +32,24 @@ function moveBall(){
   theBall.x += theBall.dx;
   theBall.y += theBall.dy;
 
-  if (theBall.y > windowHeight) {
-    theBall.y = 0 - theBall.radius;
-  }
-
-  else if (theBall.x > windowWidth) {
+  // off the right side
+  if (theBall.x - theBall.radius > width) {
     theBall.x = 0 - theBall.radius;
   }
 
-  else if (theBall.x <= 0){
-    theBall.x = 0 + theBall.radius;
+  // off the left side
+  if (theBall.x < 0 - theBall.radius){
+    theBall.x = width + theBall.radius;
+  }
+  
+  // off the  bottom
+  else if (theBall.y - theBall.radius > height) {
+    theBall.y = 0 - theBall.radius;
   }
 
-  else if (theBall.y <= 0){
-    theBall.y = 0 + theBall.radius;
+  // off the top
+  if (theBall.y < 0 - theBall.radius){
+    theBall.y = height + theBall.radius;
   }
+  
 }
