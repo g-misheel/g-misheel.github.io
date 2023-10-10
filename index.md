@@ -7,3 +7,4 @@
 
 ## Projects
 - [Interactive Scene](02-scene)
+- [ Arrays and Object Notation Assignment](04-arrays-object-assignment)
