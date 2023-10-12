@@ -1,9 +1,7 @@
-// Project Title
-// Your Name
-// Date
-//
-// Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// Perlin Noise Ball Demo
+// Misheel Gankhuyag
+// October 12, 2023
+
 
 
 let ballArray = [];
