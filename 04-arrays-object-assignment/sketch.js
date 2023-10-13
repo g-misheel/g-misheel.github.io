@@ -7,15 +7,14 @@
 
 
 let tower = [];
-let blockWidth = 50;
-let blockHeight = 20;
-let canvasWidth = 400;
-let canvasHeight = 400;
+let blockWidth = 150;
+let blockHeight = 40;
+
 let fundamentalBlock;
 let currentBlock;
 
 function setup() {
-  createCanvas(canvasWidth, canvasHeight);
+  createCanvas(windowWidth, windowHeight);
   initializeGame();
 }
 
@@ -46,7 +45,7 @@ function draw() {
     }
     if (keyIsDown(68)) {
       // D key (move right)
-      if (currentBlock.x + blockWidth + 5 <= canvasWidth) {
+      if (currentBlock.x + blockWidth + 5 <= windowWidth) {
         currentBlock.x += 5;
       }
     }
@@ -61,14 +60,14 @@ function initializeGame() {
 
 function initializeFundamentalBlock() {
   fundamentalBlock = {
-    x: canvasWidth / 2 - blockWidth / 2,
+    x: windowWidth / 2 - blockWidth / 2,
     color: color(0, 0, 0), // Fundamental block is black
   };
 }
 
 function initializeNewBlock() {
   currentBlock = {
-    x: canvasWidth / 2 - blockWidth / 2,
+    x: random(windowWidth/4, windowWidth - windowWidth/4),
     y: 0,
     color: color(random(255), random(255), random(255)),
   };
@@ -82,12 +81,7 @@ function drawTower() {
   }
 
   fill(fundamentalBlock.color);
-  rect(
-    fundamentalBlock.x,
-    canvasHeight - blockHeight,
-    blockWidth,
-    blockHeight
-  );
+  rect(fundamentalBlock.x, windowHeight - blockHeight, blockWidth, blockHeight);
 }
 
 function drawCurrentBlock() {
@@ -98,7 +92,7 @@ function drawCurrentBlock() {
 }
 
 function blockTouchesFundamentalBlock(block) {
-  let fundamentalTopY = canvasHeight - blockHeight;
+  let fundamentalTopY = windowHeight - blockHeight;
   return (
     block.x + blockWidth > fundamentalBlock.x &&
     block.x < fundamentalBlock.x + blockWidth &&
@@ -107,11 +101,11 @@ function blockTouchesFundamentalBlock(block) {
 }
 
 function blockHitsGround(block) {
-  return block.y + blockHeight >= canvasHeight;
+  return block.y + blockHeight >= windowHeight;
 }
 
 function addToTower(block) {
-  block.y = canvasHeight - blockHeight * (tower.length + 1);
+  block.y = windowHeight - blockHeight * (tower.length + 1);
   tower.push(block);
 }
 
