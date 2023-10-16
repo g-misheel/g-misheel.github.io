@@ -7,10 +7,8 @@
 
 
 let tower = [];
-let blockWidth = 150;
 let blockHeight = 40;
 
-let fundamentalBlock;
 let currentBlock;
 
 function setup() {
@@ -25,13 +23,14 @@ function draw() {
 
   if (currentBlock) {
     currentBlock.y += 5; // Falling speed
-    if (blockTouchesFundamentalBlock(currentBlock)) {
-      // If the block touches the fundamental block, it's added to the tower.
+    if (blockStacksOnTower(currentBlock)) {
+      // Add the block to the tower
       addToTower(currentBlock);
       initializeNewBlock();
     } 
+    
     else if (blockHitsGround(currentBlock)) {
-      // If the block touches the ground without landing on the fundamental block, the game is over.
+      // If the block touches the ground, the game is over
       gameOver();
     }
   }
@@ -45,7 +44,7 @@ function draw() {
     }
     if (keyIsDown(68)) {
       // D key (move right)
-      if (currentBlock.x + blockWidth + 5 <= windowWidth) {
+      if (currentBlock.x + currentBlock.width + 5 <= windowWidth) {
         currentBlock.x += 5;
       }
     }
@@ -54,22 +53,15 @@ function draw() {
 
 function initializeGame() {
   tower = [];
-  initializeFundamentalBlock();
   initializeNewBlock();
-}
-
-function initializeFundamentalBlock() {
-  fundamentalBlock = {
-    x: windowWidth / 2 - blockWidth / 2,
-    color: color(0, 0, 0), // Fundamental block is black
-  };
 }
 
 function initializeNewBlock() {
   currentBlock = {
-    x: random(windowWidth/4, windowWidth - windowWidth/4),
+    x: random(windowWidth / 4, windowWidth - windowWidth / 4),
     y: 0,
     color: color(random(255), random(255), random(255)),
+    width: random(80, 150), // Randomize the width
   };
 }
 
@@ -77,27 +69,25 @@ function drawTower() {
   for (let i = 0; i < tower.length; i++) {
     let block = tower[i];
     fill(block.color);
-    rect(block.x, block.y, blockWidth, blockHeight);
+    rect(block.x, block.y, block.width, blockHeight);
   }
-
-  fill(fundamentalBlock.color);
-  rect(fundamentalBlock.x, windowHeight - blockHeight, blockWidth, blockHeight);
 }
 
 function drawCurrentBlock() {
   if (currentBlock) {
     fill(currentBlock.color);
-    rect(currentBlock.x, currentBlock.y, blockWidth, blockHeight);
+    rect(currentBlock.x, currentBlock.y, currentBlock.width, blockHeight);
   }
 }
 
-function blockTouchesFundamentalBlock(block) {
-  let fundamentalTopY = windowHeight - blockHeight;
-  return (
-    block.x + blockWidth > fundamentalBlock.x &&
-    block.x < fundamentalBlock.x + blockWidth &&
-    block.y + blockHeight === fundamentalTopY
-  );
+function blockStacksOnTower(block) {
+  for (let i = tower.length - 1; i >= 0; i--) {
+    let existingBlock = tower[i];
+    if ( block.x + block.width > existingBlock.x && block.x < existingBlock.x + existingBlock.width && block.y + blockHeight === existingBlock.y) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function blockHitsGround(block) {
@@ -121,4 +111,5 @@ function keyPressed() {
     loop();
   }
 }
+
 
