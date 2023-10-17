@@ -16,19 +16,33 @@ let tower = [];
 let blockHeight = 40;
 let currentBlock;
 
+let gameOver;
+let gameOverImg;
+
+function preload() {
+  // Load images and store them in variables
+  gameOverImg = loadImage("gameover.png");  // Game over image
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  imageMode(CENTER);
+
   boxWidth = 300;  // Width of the start button rectangle
   boxHeight = 50;  // Height of the start button rectangle
   leftSide = (windowWidth - boxWidth) / 2;  // Centered horizontally
   topSide = (windowHeight - boxHeight) / 2;  // Centered vertically
   initializeGame();
+
+  gameOver = false;
 }
 
 function draw() {
   if (state === "start screen") {
     startScreen();  // Display the start screen
   } 
+
+  //Start game
   else if (state === "game") {
     background("lightblue");
     
@@ -46,7 +60,7 @@ function draw() {
     
         else if (blockHitsGround(currentBlock)) {
           // If the block touches the ground, the game is over
-          gameOver();
+          showGameOver();
         }
       }
 
@@ -65,6 +79,10 @@ function draw() {
         }
       }
     }
+  }
+
+  else {
+    showGameOver();  // Display the game over screen
   }
 }
 
@@ -118,8 +136,9 @@ function addToTower(block) {
   tower.push(block);
 }
 
-function gameOver() {
+function showGameOver() {
   noLoop();
+  image(gameOverImg, windowWidth / 2, windowHeight / 2, gameOverImg.width , gameOverImg.height);
   console.log("Game Over");
 }
 
