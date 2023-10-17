@@ -6,50 +6,69 @@
 // - describe what you did to take this project "above and beyond"
 
 
+let state = "start screen";  // The current game state (start screen or game)
+let leftSide;  
+let topSide;  
+let boxWidth;  
+let boxHeight;
+
 let tower = [];
 let blockHeight = 40;
-
 let currentBlock;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  boxWidth = 300;  // Width of the start button rectangle
+  boxHeight = 50;  // Height of the start button rectangle
+  leftSide = (windowWidth - boxWidth) / 2;  // Centered horizontally
+  topSide = (windowHeight - boxHeight) / 2;  // Centered vertically
   initializeGame();
 }
 
 function draw() {
-  background(220);
-  drawTower();
-  drawCurrentBlock();
-
-  if (currentBlock) {
-    currentBlock.y += 5; // Falling speed
-    if (blockStacksOnTower(currentBlock)) {
-      // Add the block to the tower
-      addToTower(currentBlock);
-      initializeNewBlock();
-    } 
+  if (state === "start screen") {
+    startScreen();  // Display the start screen
+  } 
+  else if (state === "game") {
+    background("lightblue");
     
-    else if (blockHitsGround(currentBlock)) {
-      // If the block touches the ground, the game is over
-      gameOver();
-    }
-  }
+    if (!gameOver) {
+      drawTower();
+      drawCurrentBlock();
 
-  if (currentBlock) {
-    if (keyIsDown(65)) {
-      // A key (move left)
-      if (currentBlock.x - 5 >= 0) {
-        currentBlock.x -= 5;
+      if (currentBlock) {
+        currentBlock.y += 5; // Falling speed
+        if (blockStacksOnTower(currentBlock)) {
+          // Add the block to the tower
+          addToTower(currentBlock);
+          initializeNewBlock();
+        } 
+    
+        else if (blockHitsGround(currentBlock)) {
+          // If the block touches the ground, the game is over
+          gameOver();
+        }
       }
-    }
-    if (keyIsDown(68)) {
-      // D key (move right)
-      if (currentBlock.x + currentBlock.width + 5 <= windowWidth) {
-        currentBlock.x += 5;
+
+      if (currentBlock) {
+        if (keyIsDown(65)) {
+          // A key (move left)
+          if (currentBlock.x - 5 >= 0) {
+            currentBlock.x -= 5;
+          }
+        }
+        if (keyIsDown(68)) {
+          // D key (move right)
+          if (currentBlock.x + currentBlock.width + 5 <= windowWidth) {
+            currentBlock.x += 5;
+          }
+        }
       }
     }
   }
 }
+
+
 
 function initializeGame() {
   tower = [];
@@ -112,4 +131,29 @@ function keyPressed() {
   }
 }
 
+// Display the start screen
+function startScreen() {
+  noStroke();
+  fill("lightgreen");
+  rect(leftSide, topSide, boxWidth, boxHeight);
+
+  fill("black");
+  textSize(24);
+  text("Click to Start", leftSide + boxWidth / 4, topSide + boxHeight / 2 + 10); // Centered text
+}
+
+// Handle mouse click to start the game
+function mousePressed() {
+  if (state === "start screen") {
+    let isClicked = isInRect(mouseX, mouseY, topSide, topSide + boxHeight, leftSide, leftSide + boxWidth);
+    if (isClicked) {
+      state = "game";
+    }
+  }
+}
+
+// Check if a point is inside the 'start' button
+function isInRect(x, y, top, bottom, left, right) {
+  return x >= left && x <= right && y >= top && y <= bottom;
+}
 
