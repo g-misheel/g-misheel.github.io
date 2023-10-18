@@ -15,6 +15,9 @@ let boxHeight;
 let tower = [];
 let blockHeight = 40;
 let currentBlock;
+let blockWidth = 150;
+
+let fundamentalBlock;
 
 let gameOver;
 let gameOverImg;
@@ -50,19 +53,20 @@ function draw() {
       drawTower();
       drawCurrentBlock();
 
+
       if (currentBlock) {
         currentBlock.y += 5; // Falling speed
-        if (blockStacksOnTower(currentBlock)) {
-          // Add the block to the tower
+        if (blockTouchesFundamentalBlock(currentBlock)) {
+          // If the block touches the fundamental block, it's added to the tower.
           addToTower(currentBlock);
           initializeNewBlock();
-        } 
-    
+        }
         else if (blockHitsGround(currentBlock)) {
-          // If the block touches the ground, the game is over
+          // If the block touches the ground without landing on the fundamental block, the game is over.
           showGameOver();
         }
       }
+
 
       if (currentBlock) {
         if (keyIsDown(65)) {
@@ -73,7 +77,7 @@ function draw() {
         }
         if (keyIsDown(68)) {
           // D key (move right)
-          if (currentBlock.x + currentBlock.width + 5 <= windowWidth) {
+          if (currentBlock.x + blockWidth + 5 <= windowWidth) {
             currentBlock.x += 5;
           }
         }
@@ -87,60 +91,71 @@ function draw() {
 }
 
 
-
 function initializeGame() {
   tower = [];
+  initializeFundamentalBlock();
   initializeNewBlock();
 }
 
-function initializeNewBlock() {
-  currentBlock = {
-    x: random(windowWidth / 4, windowWidth - windowWidth / 4),
-    y: 0,
-    color: color(random(255), random(255), random(255)),
-    width: random(80, 150), // Randomize the width
+
+function initializeFundamentalBlock() {
+  fundamentalBlock = {
+    x: windowWidth / 2 - blockWidth / 2,
+    color: color(0, 0, 0), // Fundamental block is black
   };
 }
+
+
+function initializeNewBlock() {
+  currentBlock = {
+    x: random(windowWidth/4, windowWidth - windowWidth/4),
+    y: 0,
+    color: color(random(255), random(255), random(255)),
+  };
+}
+
 
 function drawTower() {
   for (let i = 0; i < tower.length; i++) {
     let block = tower[i];
     fill(block.color);
-    rect(block.x, block.y, block.width, blockHeight);
+    rect(block.x, block.y, blockWidth, blockHeight);
   }
+
+
+  fill(fundamentalBlock.color);
+  rect(fundamentalBlock.x, windowHeight - blockHeight, blockWidth, blockHeight);
 }
+
 
 function drawCurrentBlock() {
   if (currentBlock) {
     fill(currentBlock.color);
-    rect(currentBlock.x, currentBlock.y, currentBlock.width, blockHeight);
+    rect(currentBlock.x, currentBlock.y, blockWidth, blockHeight);
   }
 }
 
-function blockStacksOnTower(block) {
-  for (let i = tower.length - 1; i >= 0; i--) {
-    let existingBlock = tower[i];
-    if ( block.x + block.width > existingBlock.x && block.x < existingBlock.x + existingBlock.width && block.y + blockHeight === existingBlock.y) {
-      return true;
-    }
-  }
-  return false;
+
+function blockTouchesFundamentalBlock(block) {
+  let fundamentalTopY = windowHeight - blockHeight;
+  return (
+    block.x + blockWidth > fundamentalBlock.x &&
+    block.x < fundamentalBlock.x + blockWidth &&
+    block.y + blockHeight === fundamentalTopY
+  );
 }
+
 
 function blockHitsGround(block) {
   return block.y + blockHeight >= windowHeight;
 }
+
 
 function addToTower(block) {
   block.y = windowHeight - blockHeight * (tower.length + 1);
   tower.push(block);
 }
 
-function showGameOver() {
-  noLoop();
-  image(gameOverImg, windowWidth / 2, windowHeight / 2, gameOverImg.width , gameOverImg.height);
-  console.log("Game Over");
-}
 
 function keyPressed() {
   if (keyCode === 32) {
@@ -149,6 +164,7 @@ function keyPressed() {
     loop();
   }
 }
+
 
 // Display the start screen
 function startScreen() {
@@ -174,5 +190,12 @@ function mousePressed() {
 // Check if a point is inside the 'start' button
 function isInRect(x, y, top, bottom, left, right) {
   return x >= left && x <= right && y >= top && y <= bottom;
+}
+
+//Game over screen
+function showGameOver() {
+  noLoop();
+  image(gameOverImg, windowWidth / 2, windowHeight / 2, gameOverImg.width , gameOverImg.height);
+  console.log("Game Over");
 }
 
