@@ -45,8 +45,9 @@ function setup() {
 function draw() {
   if (state === "start screen") {
     startScreen();
-  } else if (state === "game") {
-    background("lightblue");
+  } 
+  else if (state === "game") {
+    background(255);
 
     if (!gameOver) {
       drawTower();
@@ -71,7 +72,8 @@ function draw() {
             level++;
             fallingSpeed += 1;
           }
-        } else if (blockTouchesFundamentalBlock(currentBlock)) {
+        } 
+        else if (blockTouchesFundamentalBlock(currentBlock)) {
           // If the block touches the fundamental block, add it to the tower.
           addToTower(currentBlock);
           initializeNewBlock();
@@ -81,7 +83,8 @@ function draw() {
             level++;
             fallingSpeed += 1;
           }
-        } else if (blockHitsGround(currentBlock)) {
+        } 
+        else if (blockHitsGround(currentBlock)) {
           showGameOver();
         }
       }
@@ -99,7 +102,8 @@ function draw() {
         }
       }
     }
-  } else {
+  } 
+  else {
     showGameOver();
   }
 }
@@ -124,7 +128,7 @@ function initializeFundamentalBlock() {
   fundamentalBlock = {
     x: windowWidth / 2 - blockHeight / 2,
     color: color(0, 0, 0),
-    width: 150,  // Set a fixed width for the fundamental block
+    width: 150,  
     y: windowHeight - blockHeight,
   };
 }
@@ -164,7 +168,7 @@ function blockTouchesBlock(block) {
     if (
       block.x + block.width > existingBlock.x &&
       block.x < existingBlock.x + existingBlock.width &&
-      block.y + blockHeight === existingBlock.y
+      block.y + blockHeight >= existingBlock.y
     ) {
       return true;
     }
@@ -231,13 +235,14 @@ function isInRect(x, y, top, bottom, left, right) {
 
 function showGameOver() {
   noLoop();
+  // background("lightblue");
   image(gameOverImg, windowWidth / 2, windowHeight / 2, gameOverImg.width, gameOverImg.height);
   console.log("Game Over");
 }
 
 function drawScoreAndLevel() {
   fill(0);
-  textSize(18);
+  textSize(22);
   textAlign(RIGHT);
   text(`Score: ${score}`, windowWidth - 20, 30);
   text(`Level: ${level}`, windowWidth - 20, 60);
