@@ -52,11 +52,27 @@ function draw() {
       drawTower();
       drawCurrentBlock();
       drawScoreAndLevel();
+      
+      if (fundamentalBlock) {
+        fill(fundamentalBlock.color);
+        rect(fundamentalBlock.x, fundamentalBlock.y, fundamentalBlock.width, blockHeight);
+      }
 
       if (currentBlock) {
         currentBlock.y += fallingSpeed;
 
-        if (blockTouchesFundamentalBlock(currentBlock)) {
+        if (blockTouchesBlock(currentBlock)) {
+          // If the block touches the previous block, add it to the tower.
+          addToTower(currentBlock);
+          initializeNewBlock();
+          score++;
+          if (score % 5 === 0) {
+            removeAndPushBlocks();
+            level++;
+            fallingSpeed += 1;
+          }
+        } else if (blockTouchesFundamentalBlock(currentBlock)) {
+          // If the block touches the fundamental block, add it to the tower.
           addToTower(currentBlock);
           initializeNewBlock();
           score++;
@@ -98,8 +114,9 @@ function initializeGame() {
 }
 
 function removeAndPushBlocks() {
-  if (tower.length >= 5) {
-    tower.shift();
+  if (tower.length >= 7) {
+    tower.splice(0, tower.length - 1);
+    tower[tower.length - 1].y = fundamentalBlock.y - blockHeight;
   }
 }
 
@@ -108,6 +125,7 @@ function initializeFundamentalBlock() {
     x: windowWidth / 2 - blockHeight / 2,
     color: color(0, 0, 0),
     width: 150,  // Set a fixed width for the fundamental block
+    y: windowHeight - blockHeight,
   };
 }
 
@@ -127,8 +145,10 @@ function drawTower() {
     rect(block.x, block.y, block.width, blockHeight);
   }
 
-  fill(fundamentalBlock.color);
-  rect(fundamentalBlock.x, windowHeight - (blockHeight + 5), fundamentalBlock.width, blockHeight);
+  if (fundamentalBlock) {
+    fill(fundamentalBlock.color);
+    rect(fundamentalBlock.x, fundamentalBlock.y, fundamentalBlock.width, blockHeight);
+  }
 }
 
 function drawCurrentBlock() {
@@ -138,12 +158,35 @@ function drawCurrentBlock() {
   }
 }
 
+function blockTouchesBlock(block) {
+  for (let i = tower.length - 1; i >= 0; i--) {
+    let existingBlock = tower[i];
+    if (
+      block.x + block.width > existingBlock.x &&
+      block.x < existingBlock.x + existingBlock.width &&
+      block.y + blockHeight === existingBlock.y
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function blockTouchesFundamentalBlock(block) {
-  let fundamentalTopY = windowHeight - blockHeight;
+  if (tower.length > 0) {
+    let lastBlock = tower[tower.length - 1];
+    if (
+      block.x + block.width > lastBlock.x &&
+      block.x < lastBlock.x + lastBlock.width &&
+      block.y + blockHeight === lastBlock.y
+    ) {
+      return true;
+    }
+  }
   return (
     block.x + block.width > fundamentalBlock.x &&
     block.x < fundamentalBlock.x + fundamentalBlock.width &&
-    block.y + blockHeight === fundamentalTopY
+    block.y + blockHeight >= fundamentalBlock.y
   );
 }
 
@@ -152,7 +195,7 @@ function blockHitsGround(block) {
 }
 
 function addToTower(block) {
-  block.y = windowHeight - blockHeight * (tower.length + 1);
+  block.y = fundamentalBlock.y - blockHeight * (tower.length + 1);
   tower.push(block);
 }
 
@@ -199,4 +242,3 @@ function drawScoreAndLevel() {
   text(`Score: ${score}`, windowWidth - 20, 30);
   text(`Level: ${level}`, windowWidth - 20, 60);
 }
-
