@@ -3,23 +3,27 @@
 // October 10, 2023
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// - splice()-used for the remove and push function; removes the first block from the tower array, specifying the start index (0) and the number of elements to remove (2). 
 
 
-let state = "start screen";
+let state = "start screen";  //the initial game state
+// Initialize variables for button positioning
 let leftSide;
 let topSide;
 let boxWidth;
 let boxHeight;
 
+// Array to store stacked blocks
 let tower = [];
 let blockHeight = 40;
 let currentBlock;
 let fundamentalBlock;
 
+// Track the game over state
 let gameOver;
-let gameOverImg;
+let gameOverImg; // Load the game over image
 
+// Initialize score, level, speed
 let score = 0;
 let level = 1;
 let fallingSpeed = 5;
@@ -33,6 +37,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   imageMode(CENTER);
 
+  // Define button and screen positioning
   boxWidth = 300;
   boxHeight = 50;
   leftSide = (windowWidth - boxWidth) / 2;
@@ -44,11 +49,12 @@ function setup() {
 
 function draw() {
   if (state === "start screen") {
-    startScreen();
+    startScreen(); // Display the start screen
   } 
   else if (state === "game") {
-    background(255);
+    background(255); // Set the game background to white
 
+    // Game starts
     if (!gameOver) {
       drawTower();
       drawCurrentBlock();
@@ -60,25 +66,31 @@ function draw() {
       }
 
       if (currentBlock) {
-        currentBlock.y += fallingSpeed;
+        currentBlock.y += fallingSpeed;  // Move the falling block downward
 
+        // Check if the current block touches the fundamental block
         if (blockTouchesFundamentalBlock(currentBlock)) {
           // If the block touches the fundamental block, add it to the tower.
           addToTower(currentBlock);
           initializeNewBlock();
-          fundamentalBlock.y = windowWidth;
-          score++;
+          fundamentalBlock.y = windowWidth; // Moving the fundamental block off-screen
+          score++; // Increase the score
+
+          // Check if the player has reached a new level (every 5 points)
           if (score % 5 === 0) {
             removeAndPushBlocks();
             level++;
-            fallingSpeed += 1;
+            fallingSpeed += 1; // Increase the falling speed
           }
         } 
+
+        // If the block hits the ground, end the game
         else if (blockHitsGround(currentBlock)) {
           showGameOver();
         }
       }
 
+      // Control the movement of the current block using the 'a' and 'd' keys
       if (currentBlock) {
         if (keyIsDown(65)) {
           if (currentBlock.x - 5 >= 0) {
@@ -94,10 +106,11 @@ function draw() {
     }
   } 
   else {
-    showGameOver();
+    showGameOver(); // Display the game over screen
   }
 }
 
+// Restart the game
 function initializeGame() {
   tower = [];
   score = 0;
@@ -107,6 +120,7 @@ function initializeGame() {
   initializeNewBlock();
 }
 
+// Remove the first block from the tower array, when the tower gets too tall
 function removeAndPushBlocks() {
   if (tower.length >= 3) {
     tower.splice(0, 3); // Remove the first block
@@ -117,6 +131,7 @@ function removeAndPushBlocks() {
   }
 }
 
+// Fundemental block
 function initializeFundamentalBlock() {
   fundamentalBlock = {
     x: windowWidth / 2 - blockHeight / 2,
@@ -126,6 +141,7 @@ function initializeFundamentalBlock() {
   };
 }
 
+// New blocks
 function initializeNewBlock() {
   currentBlock = {
     x: random(windowWidth / 3, windowWidth - windowWidth / 3),
@@ -135,6 +151,7 @@ function initializeNewBlock() {
   };
 }
 
+//tack the blocks (tower)
 function drawTower() {
   for (let i = 0; i < tower.length; i++) {
     let block = tower[i];
@@ -155,13 +172,15 @@ function drawCurrentBlock() {
   }
 }
 
-
+// Check if a block touches the fundamental block/the last bloxk
 function blockTouchesFundamentalBlock(block) {
   if (tower.length > 0) {
     let lastBlock = tower[tower.length - 1];
     if (
+      // Check if the new block's y-coordinate between the y-coordinates of the last block
       block.y + blockHeight > lastBlock.y && 
       block.y + blockHeight < lastBlock.y + blockHeight &&
+      // Check if the new block's x-coordinate between the x-coordinates of the last block
       block.x + block.width > lastBlock.x + 10 &&
       block.x < (lastBlock.x + lastBlock.width)-10
     ) {
@@ -169,21 +188,26 @@ function blockTouchesFundamentalBlock(block) {
     }
   }
   return (
+    // Check if the new block's y-coordinate between the y-coordinates of the fundamental block
     block.y + blockHeight > fundamentalBlock.y &&
+    // Check if the new block's x-coordinate between the x-coordinates of the fundamental block
     block.x + block.width > fundamentalBlock.x &&
     block.x < fundamentalBlock.x + fundamentalBlock.width 
   );
 }
 
+// Check if a block hits the ground
 function blockHitsGround(block) {
   return block.y + blockHeight >= windowHeight;
 }
 
+// Add a block to the tower
 function addToTower(block) {
   block.y = (windowHeight - blockHeight) - blockHeight * (tower.length + 1);
   tower.push(block);
 }
 
+// Press the space key to restart the game
 function keyPressed() {
   if (keyCode === 32) {
     initializeGame();
@@ -191,6 +215,7 @@ function keyPressed() {
   }
 }
 
+// Display the start screen
 function startScreen() {
   background("lightblue")
   noStroke();
@@ -205,9 +230,10 @@ function startScreen() {
   fill("black");
   textSize(24);
   textAlign(CENTER);
-  text("Use the keys 'a' to move the block left and 'd' to move the block right", windowWidth/2, windowHeight - windowHeight/4);
+  text("Control the movement of the blocks using the 'a'(to left) and 'd'(to right) keys", windowWidth/2, windowHeight - windowHeight/4);
 }
 
+// Click to start the game
 function mousePressed() {
   if (state === "start screen") {
     let isClicked = isInRect(mouseX, mouseY, topSide, topSide + boxHeight, leftSide, leftSide + boxWidth);
@@ -217,10 +243,12 @@ function mousePressed() {
   }
 }
 
+// Check if the mouse is within a the button
 function isInRect(x, y, top, bottom, left, right) {
   return x >= left && x <= right && y >= top && y <= bottom;
 }
 
+// Display the game over screen
 function showGameOver() {
   noLoop();
   background("pink");
@@ -234,6 +262,7 @@ function showGameOver() {
   text("Final Score: " + score, windowWidth / 2, windowHeight/3);
 }
 
+// Display the current score and level
 function drawScoreAndLevel() {
   fill(0);
   textSize(22);
