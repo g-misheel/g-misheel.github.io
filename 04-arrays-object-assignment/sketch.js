@@ -62,21 +62,11 @@ function draw() {
       if (currentBlock) {
         currentBlock.y += fallingSpeed;
 
-        if (blockTouchesBlock(currentBlock)) {
-          // If the block touches the previous block, add it to the tower.
-          addToTower(currentBlock);
-          initializeNewBlock();
-          score++;
-          if (score % 5 === 0) {
-            removeAndPushBlocks();
-            level++;
-            fallingSpeed += 1;
-          }
-        } 
-        else if (blockTouchesFundamentalBlock(currentBlock)) {
+        if (blockTouchesFundamentalBlock(currentBlock)) {
           // If the block touches the fundamental block, add it to the tower.
           addToTower(currentBlock);
           initializeNewBlock();
+          fundamentalBlock.y = windowWidth;
           score++;
           if (score % 5 === 0) {
             removeAndPushBlocks();
@@ -118,9 +108,12 @@ function initializeGame() {
 }
 
 function removeAndPushBlocks() {
-  if (tower.length >= 7) {
-    tower.splice(0, tower.length - 1);
-    tower[tower.length - 1].y = fundamentalBlock.y - blockHeight;
+  if (tower.length >= 3) {
+    tower.splice(0, 3); // Remove the first block
+    for (let i = 0; i < tower.length; i++) {
+      // Move the remaining blocks up by one block height
+      tower[i].y += blockHeight*3;
+    }
   }
 }
 
@@ -135,7 +128,7 @@ function initializeFundamentalBlock() {
 
 function initializeNewBlock() {
   currentBlock = {
-    x: random(windowWidth / 4, windowWidth - windowWidth / 4),
+    x: random(windowWidth / 3, windowWidth - windowWidth / 3),
     y: 0,
     color: color(random(255), random(255), random(255)),
     width: random(100, 200),  // Random width between 100 and 200
@@ -162,35 +155,23 @@ function drawCurrentBlock() {
   }
 }
 
-function blockTouchesBlock(block) {
-  for (let i = tower.length - 1; i >= 0; i--) {
-    let existingBlock = tower[i];
-    if (
-      block.x + block.width > existingBlock.x &&
-      block.x < existingBlock.x + existingBlock.width &&
-      block.y + blockHeight >= existingBlock.y
-    ) {
-      return true;
-    }
-  }
-  return false;
-}
 
 function blockTouchesFundamentalBlock(block) {
   if (tower.length > 0) {
     let lastBlock = tower[tower.length - 1];
     if (
-      block.x + block.width > lastBlock.x &&
-      block.x < lastBlock.x + lastBlock.width &&
-      block.y + blockHeight === lastBlock.y
+      block.y + blockHeight > lastBlock.y && 
+      block.y + blockHeight < lastBlock.y + blockHeight &&
+      block.x + block.width > lastBlock.x + 10 &&
+      block.x < (lastBlock.x + lastBlock.width)-10
     ) {
       return true;
     }
   }
   return (
+    block.y + blockHeight > fundamentalBlock.y &&
     block.x + block.width > fundamentalBlock.x &&
-    block.x < fundamentalBlock.x + fundamentalBlock.width &&
-    block.y + blockHeight >= fundamentalBlock.y
+    block.x < fundamentalBlock.x + fundamentalBlock.width 
   );
 }
 
@@ -199,7 +180,7 @@ function blockHitsGround(block) {
 }
 
 function addToTower(block) {
-  block.y = fundamentalBlock.y - blockHeight * (tower.length + 1);
+  block.y = (windowHeight - blockHeight) - blockHeight * (tower.length + 1);
   tower.push(block);
 }
 
@@ -211,13 +192,20 @@ function keyPressed() {
 }
 
 function startScreen() {
+  background("lightblue")
   noStroke();
-  fill("lightgreen");
+  fill("pink");
   rect(leftSide, topSide, boxWidth, boxHeight);
 
   fill("black");
   textSize(24);
+  textAlign(LEFT);
   text("Click to Start", leftSide + boxWidth / 4, topSide + boxHeight / 2 + 10);
+
+  fill("black");
+  textSize(24);
+  textAlign(CENTER);
+  text("Use the keys 'a' to move the block left and 'd' to move the block right", windowWidth/2, windowHeight - windowHeight/4);
 }
 
 function mousePressed() {
@@ -235,9 +223,15 @@ function isInRect(x, y, top, bottom, left, right) {
 
 function showGameOver() {
   noLoop();
-  // background("lightblue");
+  background("pink");
   image(gameOverImg, windowWidth / 2, windowHeight / 2, gameOverImg.width, gameOverImg.height);
-  console.log("Game Over");
+  fill("black");
+  textSize(24);
+  textAlign(CENTER);
+  text("Press the space key to restart", windowWidth/2, windowHeight - windowHeight/4);
+  fill("darkblue");
+  textSize(32);
+  text("Final Score: " + score, windowWidth / 2, windowHeight/3);
 }
 
 function drawScoreAndLevel() {
