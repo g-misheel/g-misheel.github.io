@@ -13,4 +13,5 @@
 
 ## Projects
 - [Interactive Scene](02-scene)
-- [ Arrays and Object Notation Assignment](04-arrays-object-assignment)
+- [Arrays and Object Notation](04-arrays-object-assignment)
+- [Grid-based Game](12-grid-based)
