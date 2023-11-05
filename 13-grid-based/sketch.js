@@ -39,10 +39,6 @@ function displayGrid() {
         stroke("pink");
         rect(x*cellSize, y*cellSize, cellSize, cellSize);
       }
-      else if (grid[y][x] === 1) {
-        fill("black");
-        circle(x*cellSize, y*cellSize, cellSize, cellSize);
-      }
       
     }
   }
