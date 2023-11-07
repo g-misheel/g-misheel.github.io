@@ -11,6 +11,8 @@ const GRID_SIZE = 5;
 
 let cellSize;
 
+let colors = ["pink", "blue", "light green", "red", "yellow", "purple", "light blue"];
+
 
 function setup() {
   createCanvas(windowWidth * 0.8, windowHeight * 0.8);
@@ -39,7 +41,11 @@ function displayGrid() {
         stroke("pink");
         rect(x*cellSize, y*cellSize, cellSize, cellSize);
       }
-      
+      ellipseMode(CORNER);
+      let margin = 5;
+      stroke(0);
+      // fill(random(colors));
+      circle(x*cellSize + margin, y*cellSize + margin, cellSize - margin*2);
     }
   }
 }
