@@ -68,7 +68,7 @@ let rows = 8;
 let cols = 8;
 let tileSize = 60;
 let grid = [];
-let candyColors = 6;
+let circleColors = 6;
 
 let selected = null;
 let score = 0;
@@ -94,7 +94,7 @@ function generateGrid() {
   for (let x = 0; x < cols; x++) {
     grid[x] = [];
     for (let y = 0; y < rows; y++) {
-      grid[x][y] = floor(random(candyColors));
+      grid[x][y] = floor(random(circleColors));
     }
   }
 }
@@ -102,8 +102,8 @@ function generateGrid() {
 function displayGrid() {
   for (let x = 0; x < cols; x++) {
     for (let y = 0; y < rows; y++) {
-      let candyType = grid[x][y];
-      fill(getColor(candyType));
+      let circleType = grid[x][y];
+      fill(getColor(circleType));
       ellipse(x * tileSize + tileSize / 2, y * tileSize + tileSize / 2, tileSize - 10);
     }
   }
@@ -115,13 +115,13 @@ function displayGrid() {
     let dy = selected.y - y;
 
     if (abs(dx) + abs(dy) === 1) {
-      fill(255, 0, 0, 100); // Highlight the selected candy
+      fill(255, 0, 0, 100); // Highlight the selected circle
       ellipse(selected.x * tileSize + tileSize / 2, selected.y * tileSize + tileSize / 2, tileSize - 10);
     }
   }
 }
 
-function getColor(candyType) {
+function getColor(circleType) {
   let colors = [
     color(255, 0, 0),  // Red
     color(0, 255, 0),  // Green
@@ -130,7 +130,7 @@ function getColor(candyType) {
     color(255, 0, 255),  // Purple
     color(255, 165, 0)  // Orange
   ];
-  return colors[candyType];
+  return colors[circleType];
 }
 
 function mousePressed() {
@@ -150,7 +150,7 @@ function mouseDragged() {
     let dy = selected.y - y;
 
     if (abs(dx) + abs(dy) === 1) {
-      swapCandies(selected.x, selected.y, x, y);
+      swapCircles(selected.x, selected.y, x, y);
       selected = createVector(x, y);
     }
   }
@@ -160,13 +160,12 @@ function mouseReleased() {
   selected = null;
 }
 
-function swapCandies(x1, y1, x2, y2) {
+function swapCircles(x1, y1, x2, y2) {
   let temp = grid[x1][y1];
   grid[x1][y1] = grid[x2][y2];
   grid[x2][y2] = temp;
 
   if (!checkForMatches()) {
-    // If the swap doesn't create matches, swap back
     temp = grid[x1][y1];
     grid[x1][y1] = grid[x2][y2];
     grid[x2][y2] = temp;
@@ -179,8 +178,8 @@ function checkForMatches() {
   // Check horizontal matches
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols - 2; x++) {
-      let candyType = grid[x][y];
-      if (candyType === grid[x + 1][y] && candyType === grid[x + 2][y]) {
+      let circleType = grid[x][y];
+      if (circleType === grid[x + 1][y] && circleType === grid[x + 2][y]) {
         matches.push({ x, y });
         matches.push({ x: x + 1, y });
         matches.push({ x: x + 2, y });
@@ -191,8 +190,8 @@ function checkForMatches() {
   // Check vertical matches
   for (let x = 0; x < cols; x++) {
     for (let y = 0; y < rows - 2; y++) {
-      let candyType = grid[x][y];
-      if (candyType === grid[x][y + 1] && candyType === grid[x][y + 2]) {
+      let circleType = grid[x][y];
+      if (circleType === grid[x][y + 1] && circleType === grid[x][y + 2]) {
         matches.push({ x, y });
         matches.push({ x, y: y + 1 });
         matches.push({ x, y: y + 2 });
@@ -201,9 +200,9 @@ function checkForMatches() {
   }
 
   if (matches.length > 0) {
-    // Eliminate matched candies
+    // Eliminate matched circles
     for (let match of matches) {
-      grid[match.x][match.y] = -1; // Use a special value to mark candies for elimination
+      grid[match.x][match.y] = -1; //number that contains the eliminated circle
     }
 
     // Update the score
@@ -244,7 +243,7 @@ function applyGravity() {
   for (let x = 0; x < cols; x++) {
     for (let y = 0; y < rows; y++) {
       if (grid[x][y] === -1) {
-        grid[x][y] = floor(random(candyColors));
+        grid[x][y] = floor(random(circleColors));
       }
     }
   }
