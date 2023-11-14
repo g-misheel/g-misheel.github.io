@@ -3,81 +3,26 @@
 // October 27, 2023
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// - abs. - for finding the absolute value of a number
+// - floor() - for finding the floor  value of a number
+// - createVector() - for creating a new vector with the x and y coordinates of the mouse click position to keep track of the position of the selected circle when the mouse is pressed and dragged
 
 
-// let grid;
-// const GRID_SIZE = 5;
-
-// let cellSize;
-
-// let colors = ["pink", "blue", "light green", "red", "yellow", "purple", "light blue"];
-
-
-// function setup() {
-//   createCanvas(windowWidth * 0.8, windowHeight * 0.8);
-//   grid = generateEmptyGrid(GRID_SIZE, GRID_SIZE);
-
-
-//   if (height > width) {
-//     cellSize = width/GRID_SIZE;
-//   }
-//   else {
-//     cellSize = height/GRID_SIZE;
-//   }
-// }
-
-// function draw() {
-//   background(220);
-//   displayGrid();
-// }
-
-
-// function displayGrid() {
-//   for (let y = 0; y < GRID_SIZE; y++) {
-//     for (let x = 0; x < GRID_SIZE; x++) {
-//       if (grid[y][x] === 0) {
-//         fill("white");
-//         stroke("pink");
-//         rect(x*cellSize, y*cellSize, cellSize, cellSize);
-//       }
-//       ellipseMode(CORNER);
-//       let margin = 5;
-//       stroke(0);
-//       // fill(random(colors));
-//       circle(x*cellSize + margin, y*cellSize + margin, cellSize - margin*2);
-//     }
-//   }
-// }
-
-
-// function generateEmptyGrid(cols, rows) {
-//   let newGrid = [];
-//   for (let y = 0; y < rows; y++) {
-//     newGrid.push([]);
-//     for (let x = 0; x < cols; x++) {
-//       newGrid[y].push(0);
-//     }
-//   }
-//   return newGrid;
-// }
-
-
-
+//Variables used for the grid
 let rows = 8;
 let cols = 8;
 let tileSize = 60;
 let grid = [];
 let circleColors = 6;
 
+//Variables used for tracking the score. level, etc.
 let selected = null;
 let score = 0;
-let moves = 20;
 let level = 1;
-let objective = 2000; // Score needed to complete the level
+let target = 400; //Score needed to complete the level
 
 function setup() {
-  createCanvas(cols * tileSize, rows * tileSize);
+  createCanvas(cols * tileSize + 200, rows * tileSize); 
   generateGrid();
 }
 
@@ -85,11 +30,11 @@ function draw() {
   background(220);
   displayGrid();
   displayScore();
-  displayMoves();
   displayLevel();
-  displayObjective();
+  displayTarget();
 }
 
+//Generate the initial game grid with random circle colors
 function generateGrid() {
   for (let x = 0; x < cols; x++) {
     grid[x] = [];
@@ -99,6 +44,7 @@ function generateGrid() {
   }
 }
 
+//Display the grid on the canvas
 function displayGrid() {
   for (let x = 0; x < cols; x++) {
     for (let y = 0; y < rows; y++) {
@@ -108,6 +54,7 @@ function displayGrid() {
     }
   }
 
+  //Checks if the mouse pointer is within the circle area
   if (selected) {
     let x = floor(mouseX / tileSize);
     let y = floor(mouseY / tileSize);
@@ -115,12 +62,12 @@ function displayGrid() {
     let dy = selected.y - y;
 
     if (abs(dx) + abs(dy) === 1) {
-      fill(255, 0, 0, 100); // Highlight the selected circle
       ellipse(selected.x * tileSize + tileSize / 2, selected.y * tileSize + tileSize / 2, tileSize - 10);
     }
   }
 }
 
+//Use colors to track the circle's 'type'
 function getColor(circleType) {
   let colors = [
     color(255, 0, 0),  // Red
@@ -156,15 +103,18 @@ function mouseDragged() {
   }
 }
 
+//Reset the selected circle
 function mouseReleased() {
   selected = null;
 }
 
+//Swap two circles on the grid
 function swapCircles(x1, y1, x2, y2) {
   let temp = grid[x1][y1];
   grid[x1][y1] = grid[x2][y2];
   grid[x2][y2] = temp;
 
+  // Check for matches
   if (!checkForMatches()) {
     temp = grid[x1][y1];
     grid[x1][y1] = grid[x2][y2];
@@ -172,10 +122,11 @@ function swapCircles(x1, y1, x2, y2) {
   }
 }
 
+//Check for horizontal and vertical matches and eliminate them
 function checkForMatches() {
   let matches = [];
 
-  // Check horizontal matches
+  //Check horizontal matches
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols - 2; x++) {
       let circleType = grid[x][y];
@@ -187,7 +138,7 @@ function checkForMatches() {
     }
   }
 
-  // Check vertical matches
+  //Check vertical matches
   for (let x = 0; x < cols; x++) {
     for (let y = 0; y < rows - 2; y++) {
       let circleType = grid[x][y];
@@ -199,32 +150,33 @@ function checkForMatches() {
     }
   }
 
+  //If matches are found, remove circles, update score, and check for level completion
   if (matches.length > 0) {
-    // Eliminate matched circles
+    //Remove matched circles
     for (let match of matches) {
-      grid[match.x][match.y] = -1; //number that contains the eliminated circle
+      grid[match.x][match.y] = -1; //number that contains the removed circle
     }
 
-    // Update the score
+    //Update the score
     score += matches.length;
 
-    // Check for level completion
-    if (score >= objective) {
+    //Check for level completion
+    if (score >= target) {
       level++;
-      moves = 20; // Reset moves for the next level
-      objective += 1000; // Increase the objective for the next level
-      // Generate a new grid for the next level (you can implement this function)
+      target += 200; //Increase the target value for the next level
+      //Generate a new grid for the next level (you can implement this function)
       generateGrid();
     }
 
     applyGravity();
-    
+
     return true;
   }
 
   return false;
 }
 
+//Apply gravity to fill empty spaces after eliminating circles
 function applyGravity() {
   for (let x = 0; x < cols; x++) {
     for (let y = rows - 1; y >= 0; y--) {
@@ -240,6 +192,7 @@ function applyGravity() {
     }
   }
 
+  //Fill empty spaces with new random circles
   for (let x = 0; x < cols; x++) {
     for (let y = 0; y < rows; y++) {
       if (grid[x][y] === -1) {
@@ -252,23 +205,18 @@ function applyGravity() {
 function displayScore() {
   fill(0);
   textSize(24);
-  text(`Score: ${score}`, 10, height - 10);
+  text("Score: " + score, width - 180, 30);
 }
 
-function displayMoves() {
-  fill(0);
-  textSize(24);
-  text(`Moves: ${moves}`, width - 100, height - 10);
-}
 
 function displayLevel() {
   fill(0);
   textSize(24);
-  text(`Level: ${level}`, 10, 30);
+  text("Level: " + level, width - 180, 60);
 }
 
-function displayObjective() {
+function displayTarget() {
   fill(0);
   textSize(24);
-  text(`Objective: ${objective}`, width - 200, 30);
+  text("Target: " + target, width - 180, 90);
 }
