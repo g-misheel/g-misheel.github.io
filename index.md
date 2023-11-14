@@ -12,6 +12,7 @@
 - [Grid Neighbours](11-neighbours)
 - [Game of Life](12-game-of-life)
 - [Character in Grid](14-character-in-grid)
+- [Dog OOP Demo](15-dog-oop)
 
 ## Projects
 - [Interactive Scene](02-scene)
