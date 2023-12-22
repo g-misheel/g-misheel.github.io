@@ -19,6 +19,7 @@
 - [Fireworks OOP Demo](19-fireworks)
 - [Inheritance OOP Demo](20-inheritance)
 - [Collision Demo](21-collide2d)
+- [Recursive Circles](22-recursion)
 
 ## Projects
 - [Interactive Scene](02-scene)
